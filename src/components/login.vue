@@ -29,7 +29,7 @@ export default {
     async handleLogin () {
       const res = await this.$http.post(`login`, this.formdata)
       const {data: {data: {token}, meta: {msg, status}}} = res
-      console.log(res)
+      // console.log(res)
       if (status === 200) {
         localStorage.setItem('token', token)
         this.$router.push({

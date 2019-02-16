@@ -9,14 +9,14 @@
           <h2>电商后台管理系统</h2>
         </el-col>
         <el-col :span="1">
-          <a class="logout" href="#">退出</a>
+          <a class="logout" href="#" @click="handleLoginout()">退出</a>
         </el-col>
       </el-row>
     </el-header>
     <el-container>
       <el-aside class="aside" width="200px">
         <el-menu
-          :unique-opened='true'
+          :unique-opened="true"
           :router="true"
           default-active="2"
           class="el-menu-vertical-demo"
@@ -94,18 +94,27 @@
 
 <script>
 export default {
-  beforeMount () {
-    if (!localStorage.getItem('token')) {
+  beforeMount() {
+    if (!localStorage.getItem("token")) {
       this.$router.push({
-        name: 'login'
-      })
-      this.$message.warning('请先登陆')
+        name: "login"
+      });
+      this.$message.warning("请先登陆");
     }
   },
-  mounted () {
-    console.log(222)
+  mounted() {
+  },
+  methods: {
+    //退出功能
+    handleLoginout() {
+      localStorage.clear()
+      this.$router.push({
+          name:'login'
+      })
+      this.$message.success("退出成功");
+    }
   }
-}
+};
 </script>
 
 <style>
