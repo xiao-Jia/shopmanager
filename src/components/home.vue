@@ -20,8 +20,6 @@
           :router="true"
           default-active="2"
           class="el-menu-vertical-demo"
-          @open="handleOpen"
-          @close="handleClose"
         >
           <el-submenu index="1">
             <template slot="title">
@@ -88,7 +86,7 @@
         </el-menu>
       </el-aside>
       <el-main class="main">
-          <router-view></router-view>
+        <router-view></router-view>
       </el-main>
     </el-container>
   </el-container>
@@ -104,15 +102,14 @@ export default {
       this.$message.warning("请先登陆");
     }
   },
-  mounted() {
-  },
+  mounted() {},
   methods: {
     //退出功能
     handleLoginout() {
-      localStorage.clear()
+      localStorage.clear();
       this.$router.push({
-          name:'login'
-      })
+        name: "login"
+      });
       this.$message.success("退出成功");
     }
   }

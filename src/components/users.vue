@@ -10,26 +10,53 @@
     <el-row class="seartBox">
       <el-col>
         <!-- 搜索框 -->
-        <el-input 
-        class="searchInput"
-        placeholder="请输入内容" v-model="query">
+        <el-input class="searchInput" placeholder="请输入内容" v-model="query">
           <el-button slot="append" icon="el-icon-search"></el-button>
         </el-input>
         <!-- 添加按钮 -->
-          <el-button type="success">添加用户</el-button>
+        <el-button type="success">添加用户</el-button>
       </el-col>
     </el-row>
     <!-- 表格 -->
+    <el-table :data="list" style="width: 100%">
+      <el-table-column prop="date" label="#" width="80"></el-table-column>
+      <el-table-column prop="name" label="姓名" width="120"></el-table-column>
+      <el-table-column prop="address" label="邮箱" width="140"></el-table-column>
+      <el-table-column prop="address" label="电话" width="140"></el-table-column>
+      <el-table-column prop="address" label="创建日期" width="140"></el-table-column>
+      <el-table-column prop="address" label="用户状态" width="140"></el-table-column>
+      <el-table-column prop="address" label="操作" width="200"></el-table-column>
+    </el-table>
     <!-- 分页 -->
   </el-card>
 </template>
 <script>
 export default {
-    data(){
-        return {
-            query:''
-        }
+  data() {
+    return {
+      query: "",
+      pagenum: 1,
+      pagesize: 2,
+      //表格数据
+      list: []
+    };
+  },
+  //获取首屏数据方法调用
+  created() {
+    this.getTableData();
+  },
+  methods: {
+    async getTableData() {
+      const AUTH_TOKEN = localStorage.getItem("token");
+      this.$http.defaults.headers.common["Authorization"] = AUTH_TOKEN;
+      const res = await this.$http.get(
+        `users?query=${this.query}&pagenum=${this.pagenum}&pagesize=${
+          this.pagesize
+        }`
+      );
+      console.log(res);
     }
+  }
 };
 </script>
 
@@ -38,9 +65,9 @@ export default {
   height: 100%;
 }
 .seartBox {
-    margin-top: 20px;
+  margin-top: 20px;
 }
 .searchInput {
-    width: 350px;
+  width: 350px;
 }
 </style>
