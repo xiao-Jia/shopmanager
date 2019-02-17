@@ -74,7 +74,7 @@
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogFormVisibleAdd = false">取 消</el-button>
-        <el-button type="primary" @click="dialogFormVisibleAdd = false">确 定</el-button>
+        <el-button type="primary" @click="addUser()">确 定</el-button>
       </div>
     </el-dialog>
   </el-card>
@@ -91,7 +91,7 @@ export default {
       // 表格数据
       list: [],
       dialogFormVisibleAdd: false,
-      //表单数据
+      // 表单数据
       formdata: {
         username: "",
         password: "",
@@ -105,21 +105,39 @@ export default {
     this.getTableData();
   },
   methods: {
-    //点击添加用户按钮打开对话框
-    showDialog(){
-      this.dialogFormVisibleAdd=true
+    //点击确定发送请求
+    async addUser() {
+      //发送请求
+      const res = await this.$http.post(`users`, this.formdata);
+      console.log(res);
+      const {
+        meta: { msg, status }
+      } = res.data;
+      if (status === 201) {
+        //关闭对话框
+        this.dialogFormVisibleAdd = false;
+        //更新表格
+        this.getTableData();
+        this.$message.success("添加成功");
+      }
     },
-    //搜索-清空时获取所有用户
+    // 点击添加用户按钮打开对话框
+    showDialog() {
+      this.dialogFormVisibleAdd = true;
+      //清空
+      this.formdata = {};
+    },
+    // 搜索-清空时获取所有用户
     getAllUsers() {
       this.getTableData();
     },
-    //搜索用户
+    // 搜索用户
     searchUser() {
-      //按照query关键字搜索
+      // 按照query关键字搜索
       this.pagenum = 1;
       this.getTableData();
     },
-    //分页相关方法
+    // 分页相关方法
     handleSizeChange(val) {
       this.pagenum = 1;
       this.pagesize = val;
@@ -129,10 +147,10 @@ export default {
       this.pagenum = val;
       this.getTableData();
     },
-    //获取表格数据
+    // 获取表格数据
     async getTableData() {
-      //授权
-      //除了登陆请求 其他请求都需要授权
+      // 授权
+      // 除了登陆请求 其他请求都需要授权
       const AUTH_TOKEN = localStorage.getItem("token");
       this.$http.defaults.headers.common["Authorization"] = AUTH_TOKEN;
       const res = await this.$http.get(
@@ -140,7 +158,7 @@ export default {
           this.pagesize
         }`
       );
-      //   console.log(res);
+      // console.log(res);
       const {
         data,
         meta: { msg, status }

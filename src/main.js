@@ -15,7 +15,7 @@ Vue.use(ElementUI)
 
 Vue.config.productionTip = false
 
-//全局过滤器 处理日期格式
+// 全局过滤器 处理日期格式
 
 Vue.filter('fmtdate', (v) => {
   return moment(v).format('YYYY-MM-DD')
