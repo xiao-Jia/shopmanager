@@ -28,13 +28,13 @@ export default {
   methods: {
     async handleLogin () {
       const res = await this.$http.post(`login`, this.formdata)
-      if (res.data.data === null){
+      if (res.data.data === null) {
         this.$message.error(res.data.meta.msg)
       }
       const {data: {data: {token}, meta: {msg, status}}} = res
       // console.log(res)
       if (status === 200) {
-        localStorage.setItem('token',token)
+        localStorage.setItem('token', token)
         this.$router.push({
           name: 'home'
         })

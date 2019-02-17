@@ -94,26 +94,26 @@
 
 <script>
 export default {
-  beforeMount() {
-    if (!localStorage.getItem("token")) {
+  beforeMount () {
+    if (!localStorage.getItem('token')) {
       this.$router.push({
-        name: "login"
-      });
-      this.$message.warning("请先登陆");
+        name: 'login'
+      })
+      this.$message.warning('请先登陆')
     }
   },
-  mounted() {},
+  mounted () {},
   methods: {
-    //退出功能
-    handleLoginout() {
-      localStorage.clear();
+    // 退出功能
+    handleLoginout () {
+      localStorage.clear()
       this.$router.push({
-        name: "login"
-      });
-      this.$message.success("退出成功");
+        name: 'login'
+      })
+      this.$message.success('退出成功')
     }
   }
-};
+}
 </script>
 
 <style>
