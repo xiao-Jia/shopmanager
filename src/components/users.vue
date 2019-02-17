@@ -20,7 +20,7 @@
           <el-button slot="append" icon="el-icon-search" @click="searchUser()"></el-button>
         </el-input>
         <!-- 添加按钮 -->
-        <el-button @click="showDialog" type="success">添加用户</el-button>
+        <el-button @click="showDialog()" type="success">添加用户</el-button>
       </el-col>
     </el-row>
     <!-- 表格 -->
@@ -40,7 +40,14 @@
       <el-table-column prop="address" label="操作" width="200">
         <template slot-scope="scope">
           <el-button type="primary" icon="el-icon-edit" size="small" circle plain></el-button>
-          <el-button type="danger" icon="el-icon-delete" size="small" circle plain></el-button>
+          <el-button
+            @click="showMsgBoxDele(scope.row)"
+            type="danger"
+            icon="el-icon-delete"
+            size="small"
+            circle
+            plain
+          ></el-button>
           <el-button type="success" icon="el-icon-check" size="small" circle plain></el-button>
         </template>
       </el-table-column>
@@ -105,7 +112,26 @@ export default {
     this.getTableData();
   },
   methods: {
-    //点击确定发送请求
+    //删除用户-显示对话框
+    showMsgBoxDele(user) {
+      this.$confirm("是否要删掉本宝宝?", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning"
+      })
+        .then(async () => {
+          const res = await this.$http.delete(`users/${user.id}`)
+          const {meta:{msg,status}} = res.data
+          if (status === 200){
+            this.$message.success(msg)
+            this.getTableData()
+          }
+        })
+        .catch(() => {
+          this.$message.info("已取消删除")
+        });
+    },
+    //添加用户-点击确定发送请求
     async addUser() {
       //发送请求
       const res = await this.$http.post(`users`, this.formdata);
