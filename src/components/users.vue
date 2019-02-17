@@ -10,15 +10,21 @@
     <el-row class="seartBox">
       <el-col>
         <!-- 搜索框 -->
-        <el-input class="searchInput" placeholder="请输入内容" v-model="query">
-          <el-button slot="append" icon="el-icon-search"></el-button>
+        <el-input
+          @clear="getAllUsers()"
+          clearable
+          class="searchInput"
+          placeholder="请输入内容"
+          v-model="query"
+        >
+          <el-button slot="append" icon="el-icon-search" @click="searchUser()"></el-button>
         </el-input>
         <!-- 添加按钮 -->
         <el-button type="success">添加用户</el-button>
       </el-col>
     </el-row>
     <!-- 表格 -->
-    <el-table :data="list" style="width: 100%">
+    <el-table height="350px" :data="list" style="width: 100%">
       <el-table-column prop="id" label="#" width="80"></el-table-column>
       <el-table-column prop="username" label="姓名" width="120"></el-table-column>
       <el-table-column prop="email" label="邮箱" width="140"></el-table-column>
@@ -28,7 +34,7 @@
       </el-table-column>
       <el-table-column label="用户状态" width="140">
         <template slot-scope="scope">
-        <el-switch v-model="scope.row.mg_state" active-color="#13ce66" inactive-color="#ff4949"></el-switch>
+          <el-switch v-model="scope.row.mg_state" active-color="#13ce66" inactive-color="#ff4949"></el-switch>
         </template>
       </el-table-column>
       <el-table-column prop="address" label="操作" width="200">
@@ -36,10 +42,20 @@
           <el-button type="primary" icon="el-icon-edit" size="small" circle plain></el-button>
           <el-button type="danger" icon="el-icon-delete" size="small" circle plain></el-button>
           <el-button type="success" icon="el-icon-check" size="small" circle plain></el-button>
-        </template>  
+        </template>
       </el-table-column>
     </el-table>
     <!-- 分页 -->
+    <el-pagination
+      class="el-pagination"
+      @size-change="handleSizeChange"
+      @current-change="handleCurrentChange"
+      :current-page="pagenum"
+      :page-sizes="[2, 4, 6, 8]"
+      :page-size="100"
+      layout="total, sizes, prev, pager, next, jumper"
+      :total="total"
+    ></el-pagination>
   </el-card>
 </template>
 <script>
@@ -48,7 +64,8 @@ export default {
     return {
       query: "",
       pagenum: 1,
-      pagesize: 10,
+      pagesize: 2,
+      total: -1,
       // 表格数据
       list: []
     };
@@ -58,7 +75,30 @@ export default {
     this.getTableData();
   },
   methods: {
+    //搜索-清空时获取所有用户
+    getAllUsers() {
+      this.getTableData();
+    },
+    //搜索用户
+    searchUser() {
+      //按照query关键字搜索
+      this.pagenum = 1;
+      this.getTableData();
+    },
+    //分页相关方法
+    handleSizeChange(val) {
+      this.pagenum = 1;
+      this.pagesize = val;
+      this.getTableData();
+    },
+    handleCurrentChange(val) {
+      this.pagenum = val;
+      this.getTableData();
+    },
+    //获取表格数据
     async getTableData() {
+      //授权
+      //除了登陆请求 其他请求都需要授权
       const AUTH_TOKEN = localStorage.getItem("token");
       this.$http.defaults.headers.common["Authorization"] = AUTH_TOKEN;
       const res = await this.$http.get(
@@ -73,7 +113,8 @@ export default {
       } = res.data;
       if (status === 200) {
         this.list = data.users;
-        console.log(this.list);
+        this.total = data.total;
+        // console.log(this.list);
       }
     }
   }
@@ -89,5 +130,8 @@ export default {
 }
 .searchInput {
   width: 350px;
+}
+.el-pagination {
+  margin-top: 20px;
 }
 </style>
