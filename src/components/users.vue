@@ -311,8 +311,8 @@ export default {
     async getTableData() {
       // 授权
       // 除了登陆请求 其他请求都需要授权
-      const AUTH_TOKEN = localStorage.getItem("token");
-      this.$http.defaults.headers.common["Authorization"] = AUTH_TOKEN;
+      // const AUTH_TOKEN = localStorage.getItem("token");
+      // this.$http.defaults.headers.common["Authorization"] = AUTH_TOKEN;
       const res = await this.$http.get(
         `users?query=${this.query}&pagenum=${this.pagenum}&pagesize=${
           this.pagesize
