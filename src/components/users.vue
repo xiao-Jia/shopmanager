@@ -238,10 +238,11 @@ export default {
       }
     },
     //点击编辑-显示对话框
-    showUsersEdit(user) {
+    async showUsersEdit(user) {
       //获取当前用户数据
-      this.formdata = user;
       this.dialogFormVisibleEdit = true;
+      const res = await this.$http.get(`users/${user.id}`);
+      this.formdata = res.data.data;
     },
     //删除用户-显示对话框
     showMsgBoxDele(user) {

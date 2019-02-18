@@ -21,8 +21,6 @@ HttpServer.install = function (Vue) {
         return Promise.reject(error);
     });
 
-    // const AUTH_TOKEN = localStorage.getItem("token");
-    // axios.defaults.headers.common["Authorization"] = AUTH_TOKEN;
     Vue.prototype.$http = axios;
 
 }
