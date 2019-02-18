@@ -60,7 +60,14 @@
             circle
             plain
           ></el-button>
-          <el-button type="success" icon="el-icon-check" size="small" circle plain></el-button>
+          <el-button
+            @click="showDiaSetRole(scope.row)"
+            type="success"
+            icon="el-icon-check"
+            size="small"
+            circle
+            plain
+          ></el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -114,6 +121,27 @@
         <el-button type="primary" @click="editUser()">确 定</el-button>
       </div>
     </el-dialog>
+    <!-- 分配角色对话框 -->
+    <el-dialog title="分配角色" :visible.sync="dialogFormVisibleRole">
+      <el-form label-position="left" label-width="80px" :model="formdata">
+        <el-form-item label="用户名">{{formdata.username}}</el-form-item>
+        <el-form-item label="角色">
+          <el-select v-model="selectVal" placeholder="请选择角色">
+            <el-option disabled label="请选择" :value="-1"></el-option>
+            <el-option
+              v-for="(item) in roles"
+              :key="item.id"
+              :label="item.roleName"
+              :value="item.id"
+            ></el-option>
+          </el-select>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="dialogFormVisibleRole = false">取 消</el-button>
+        <el-button type="primary" @click="setRole()">确 定</el-button>
+      </div>
+    </el-dialog>
   </el-card>
 </template>
 
@@ -129,13 +157,19 @@ export default {
       list: [],
       dialogFormVisibleAdd: false,
       dialogFormVisibleEdit: false,
+      dialogFormVisibleRole: false,
       // 表单数据 -> 将来发送post请求 -> 请求体 ->
       formdata: {
         username: "",
         password: "",
         email: "",
         mobile: ""
-      }
+      },
+      //分配角色相关数据
+      selectVal: -1,
+      currUserId: -1,
+      //角色数组
+      roles: []
     };
   },
   // 获取首屏数据方法调用
@@ -143,6 +177,36 @@ export default {
     this.getTableData();
   },
   methods: {
+    //分配角色-发送请求
+    async setRole() {
+      const res = await this.$http.put(`users/${this.currUserId}/role`, {
+        rid: this.selectVal
+      });
+      const {
+        meta: { msg, status }
+      } = res.data;
+      if (status === 200) {
+        this.dialogFormVisibleRole = false;
+        this.$message.success(msg);
+      }
+    },
+    //分配角色 - 打开对话框
+    async showDiaSetRole(user) {
+      this.formdata = user;
+      this.currUserId = user.id;
+      this.dialogFormVisibleRole = true;
+      //获取角色名称
+      const res = await this.$http.get(`roles`);
+      const {
+        meta: { msg, status }
+      } = res.data;
+      if (status === 200) {
+        this.roles = res.data.data;
+      }
+      //给下拉框v-model绑定的selectVal赋值
+      const res2 = await this.$http.get(`users/${user.id}`);
+      this.selectVal = res2.data.data.rid;
+    },
     //修改状态
     async changeState(user) {
       const res = await this.$http.put(
