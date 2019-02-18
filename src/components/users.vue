@@ -34,12 +34,24 @@
       </el-table-column>
       <el-table-column label="用户状态" width="140">
         <template slot-scope="scope">
-          <el-switch v-model="scope.row.mg_state" active-color="#13ce66" inactive-color="#ff4949"></el-switch>
+          <el-switch
+            @change="changeState(scope.row)"
+            v-model="scope.row.mg_state"
+            active-color="#13ce66"
+            inactive-color="#ff4949"
+          ></el-switch>
         </template>
       </el-table-column>
       <el-table-column prop="address" label="操作" width="200">
         <template slot-scope="scope">
-          <el-button type="primary" icon="el-icon-edit" size="small" circle plain></el-button>
+          <el-button
+            @click="showUsersEdit(scope.row)"
+            type="primary"
+            icon="el-icon-edit"
+            size="small"
+            circle
+            plain
+          ></el-button>
           <el-button
             @click="showMsgBoxDele(scope.row)"
             type="danger"
@@ -84,6 +96,24 @@
         <el-button type="primary" @click="addUser()">确 定</el-button>
       </div>
     </el-dialog>
+    <!-- 编辑用户对话框 -->
+    <el-dialog title="编辑用户" :visible.sync="dialogFormVisibleEdit">
+      <el-form label-position="left" label-width="80px" :model="formdata">
+        <el-form-item label="用户名">
+          <el-input disabled v-model="formdata.username"></el-input>
+        </el-form-item>
+        <el-form-item label="邮箱">
+          <el-input v-model="formdata.email"></el-input>
+        </el-form-item>
+        <el-form-item label="电话">
+          <el-input v-model="formdata.mobile"></el-input>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="dialogFormVisibleEdit = false">取 消</el-button>
+        <el-button type="primary" @click="editUser()">确 定</el-button>
+      </div>
+    </el-dialog>
   </el-card>
 </template>
 
@@ -98,7 +128,8 @@ export default {
       // 表格数据
       list: [],
       dialogFormVisibleAdd: false,
-      // 表单数据
+      dialogFormVisibleEdit: false,
+      // 表单数据 -> 将来发送post请求 -> 请求体 ->
       formdata: {
         username: "",
         password: "",
@@ -112,6 +143,42 @@ export default {
     this.getTableData();
   },
   methods: {
+    //修改状态
+    async changeState(user) {
+      const res = await this.$http.put(
+        `users/${user.id}/state/${user.mg_state}`
+      );
+      const {
+        meta: { msg, status }
+      } = res.data;
+      if (status === 200) {
+        this.$message.success(msg);
+      }
+    },
+    //编辑-发送请求
+    async editUser() {
+      //this.formdata上一步已经是user
+      const res = await this.$http.put(
+        `users/${this.formdata.id}`,
+        this.formdata
+      );
+      const {
+        meta: { msg, status }
+      } = res.data;
+      if (status === 200) {
+        this.$message.success(msg);
+        //关闭对话框
+        this.dialogFormVisibleEdit = false;
+        //更新表格
+        this.getTableData();
+      }
+    },
+    //点击编辑-显示对话框
+    showUsersEdit(user) {
+      //获取当前用户数据
+      this.formdata = user;
+      this.dialogFormVisibleEdit = true;
+    },
     //删除用户-显示对话框
     showMsgBoxDele(user) {
       this.$confirm("是否要删掉本宝宝?", "提示", {
@@ -120,15 +187,18 @@ export default {
         type: "warning"
       })
         .then(async () => {
-          const res = await this.$http.delete(`users/${user.id}`)
-          const {meta:{msg,status}} = res.data
-          if (status === 200){
-            this.$message.success(msg)
-            this.getTableData()
+          const res = await this.$http.delete(`users/${user.id}`);
+          const {
+            meta: { msg, status }
+          } = res.data;
+          if (status === 200) {
+            this.$message.success(msg);
+            this.pagenum = 1;
+            this.getTableData();
           }
         })
         .catch(() => {
-          this.$message.info("已取消删除")
+          this.$message.info("已取消删除");
         });
     },
     //添加用户-点击确定发送请求
